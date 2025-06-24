@@ -1,40 +1,63 @@
-import { Heart, User } from 'lucide-react'
-import { useAuth } from '../contexts/AuthContext'
+import React from 'react';
+import { Heart, User } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';  
+import { useNavigate } from 'react-router-dom';     
+import { showToast } from '../utils/toast';         
 
-const Header = () => {
-  const { user, logout } = useAuth()
+export const Header = () => {
+  const { user, logout, isLoading } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    showToast.success('Logged out successfully');
+    navigate('/login');
+  };
+
+  if (isLoading) {
+    return (
+      <header className="bg-white shadow-sm border-b border-pink-100">
+        <div className="max-w-6xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Heart className="h-8 w-8 text-pink-500" />
+              <span className="text-2xl font-bold text-gray-800">BabySteps</span>
+            </div>
+            <div className="animate-pulse h-8 w-24 bg-gray-200 rounded"></div>
+          </div>
+        </div>
+      </header>
+    );
+  }
 
   return (
-    <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-pink-100">
-      <div className="max-w-6xl mx-auto px-6 py-4">
+    <header className="bg-white shadow-sm border-b border-pink-100">
+      <div className="max-w-6xl mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <Heart className="h-7 w-7 text-pink-500" />
-            <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
-              BabySteps
-            </span>
+          <div className="flex items-center space-x-2">
+            <Heart className="h-8 w-8 text-pink-500" />
+            <span className="text-2xl font-bold text-gray-800">BabySteps</span>
           </div>
           
-          {user && (
+          {user ? (
             <div className="flex items-center space-x-4">
               <div className="text-right">
-                <p className="text-sm font-medium text-gray-700">{user.name}</p>
-                <p className="text-xs bg-pink-500 text-white px-2 py-1 rounded-full">
-                  Week {user.pregnancyWeek}
-                </p>
+                <p className="text-sm font-medium text-gray-700">{user?.name || 'User'}</p>
+                <p className="text-xs text-pink-600">Week {user?.pregnancyWeek ?? '--'}</p>
               </div>
               <button
-                onClick={logout}
-                className="p-2 rounded-full bg-pink-50 text-pink-500 hover:bg-pink-100"
+                onClick={handleLogout}
+                className="flex items-center space-x-1 text-gray-600 hover:text-gray-800"
+                aria-label="Logout"
               >
                 <User className="h-5 w-5" />
               </button>
             </div>
+          ) : (
+            <div className="h-8"></div> 
           )}
         </div>
       </div>
     </header>
-  )
+  );
 }
-
-export default Header
