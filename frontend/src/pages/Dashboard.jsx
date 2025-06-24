@@ -1,79 +1,144 @@
-import { useState } from 'react';
-import { Heart, Plus, MessageCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Plus, Baby } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { api } from '../api/index';
+import { Header } from '../components/Header';
+import { PersonalizedRecommendations } from '../components/PersonalizedRecommendations';
+import { MilestoneCard } from '../components/MilestoneCard';
+import { AddMilestoneForm } from '../components/AddMilestoneForm';
+import { CommunityTipsModal } from '../components/CommunityTipsModal';
+import { Toast } from '../utils/toast';
 
 export const Dashboard = () => {
-  const [milestones, setMilestones] = useState([
-    {
-      id: 1,
-      title: "Heard the Heartbeat",
-      week: 16,
-      date: "2024-02-20",
-      notes: "Most beautiful sound ever heard!"
-    }
-  ]);
-  const [showForm, setShowForm] = useState(false);
+  const { user } = useAuth();
+  const [milestones, setMilestones] = useState([]);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [selectedMilestone, setSelectedMilestone] = useState(null);
+  const [toast, setToast] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const milestonesData = await api.getMilestones();
+        setMilestones(sortMilestones(milestonesData));
+      } catch (error) {
+        console.error('Error loading milestones:', error);
+        setToast({ 
+          message: 'Failed to load milestones. Please try again.', 
+          type: 'error' 
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, []);
+
+  const sortMilestones = (milestones) => {
+    return [...milestones].sort((a, b) => new Date(b.date) - new Date(a.date));
+  };
+
+  const handleAddMilestone = (newMilestone) => {
+    setMilestones(prev => sortMilestones([newMilestone, ...prev]));
+    setToast({ 
+      message: 'Milestone added successfully!', 
+      type: 'success' 
+    });
+    setShowAddForm(false);
+  };
+
+  const handleViewTips = (milestone) => {
+    setSelectedMilestone(milestone);
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 p-6">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      
+      <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Personalized Recommendations */}
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">BabySteps</h1>
-          <div className="space-y-3">
-            <p className="font-medium">Personalized for Week 24</p>
-            <ul className="list-disc list-inside space-y-2 text-gray-700">
-              <li>Take glucose screening test</li>
-              <li>Consider taking childbirth classes</li>
-            </ul>
-          </div>
-        </div>
+        {user?.pregnancyWeek && (
+          <PersonalizedRecommendations user={user} />
+        )}
 
         {/* Milestones Section */}
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Your Milestones</h2>
-          
-          {milestones.map(milestone => (
-            <div key={milestone.id} className="mb-6 pb-6 border-b border-gray-100 last:border-0">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-bold text-gray-800">{milestone.title}</h3>
-                  <p className="text-sm text-pink-500">Week {milestone.week}</p>
-                </div>
-                <span className="text-sm text-gray-400">
-                  {new Date(milestone.date).toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: 'short', 
-                    day: 'numeric' 
-                  })}
-                </span>
-              </div>
-              
-              {milestone.notes && (
-                <p className="mt-2 text-gray-600">{milestone.notes}</p>
-              )}
-              
-              <button className="mt-3 flex items-center text-pink-500 hover:text-pink-600 text-sm font-medium">
-                <MessageCircle className="h-4 w-4 mr-2" />
-                View Community Tips
-              </button>
-            </div>
-          ))}
-
-          <button 
-            onClick={() => setShowForm(true)}
-            className="flex items-center justify-center w-full py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-pink-300 hover:bg-pink-50 transition-colors text-pink-500"
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold text-gray-800">Your Milestones</h1>
+          <button
+            onClick={() => setShowAddForm(true)}
+            className="flex items-center space-x-2 bg-pink-500 text-white px-4 py-2 rounded-lg hover:bg-pink-600 transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2"
+            aria-label="Add new milestone"
           >
-            <Plus className="h-5 w-5 mr-2" />
-            Add Milestone
+            <Plus className="h-5 w-5" />
+            <span>Add Milestone</span>
           </button>
         </div>
+
+        {/* Loading State */}
+        {isLoading && (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {[...Array(3)].map((_, i) => (
+              <div key={`skeleton-${i}`} className="bg-white rounded-lg border border-gray-200 p-6 animate-pulse h-40" />
+            ))}
+          </div>
+        )}
+
+        {/* Milestones Grid */}
+        {!isLoading && milestones.length > 0 && (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {milestones.map((milestone) => (
+              <MilestoneCard
+                key={milestone.id}
+                milestone={milestone}
+                onViewTips={handleViewTips}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!isLoading && milestones.length === 0 && (
+          <div className="text-center py-12">
+            <Baby className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-500 mb-2">
+              No milestones yet
+            </h3>
+            <p className="text-gray-400 mb-4">
+              Start tracking your pregnancy journey by adding your first milestone
+            </p>
+            <button
+              onClick={() => setShowAddForm(true)}
+              className="bg-pink-500 text-white px-6 py-2 rounded-lg hover:bg-pink-600 transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2"
+            >
+              Add Your First Milestone
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* Milestone Form Modal */}
-      {showForm && (
-        <MilestoneForm 
-          onClose={() => setShowForm(false)}
-          onAdd={(newMilestone) => setMilestones([...milestones, newMilestone])}
+      {/* Modals */}
+      {showAddForm && (
+        <AddMilestoneForm
+          onClose={() => setShowAddForm(false)}
+          onAdd={handleAddMilestone}
+        />
+      )}
+
+      {selectedMilestone && (
+        <CommunityTipsModal
+          milestone={selectedMilestone}
+          onClose={() => setSelectedMilestone(null)}
+        />
+      )}
+
+      {/* Toast Notifications */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
         />
       )}
     </div>
