@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Baby } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { api } from '../api/index';
+import  api  from '../api';
 import { Header } from '../components/Header';
 import { PersonalizedRecommendations } from '../components/PersonalizedRecommendations';
 import { MilestoneCard } from '../components/MilestoneCard';
 import { AddMilestoneForm } from '../components/AddMilestoneForm';
 import { CommunityTipsModal } from '../components/CommunityTipsModal';
-import { Toast } from '../utils/toast';
+import { Toast } from '../components/Toast';
 
 export const Dashboard = () => {
   const { user } = useAuth();
@@ -90,7 +90,7 @@ export const Dashboard = () => {
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {milestones.map((milestone) => (
               <MilestoneCard
-                key={milestone.id}
+                key={milestone.id || milestone.id}
                 milestone={milestone}
                 onViewTips={handleViewTips}
               />

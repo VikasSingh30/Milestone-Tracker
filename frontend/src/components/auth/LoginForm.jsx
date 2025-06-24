@@ -31,7 +31,7 @@ export const LoginForm = () => {
     try {
       await login(email, password);
       showToast.success('Logged in successfully');
-      navigate('/dashboard');
+      navigate('/');
     } catch (error) {
       console.error('Login failed:', error);
       showToast.error(error.response?.data?.message || 'Login failed. Please try again.');

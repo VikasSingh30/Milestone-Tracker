@@ -35,7 +35,7 @@ export const RegisterForm = () => {
     try {
       await register({ name, email, password, pregnancyWeek });
       showToast.success('Registered successfully');
-      navigate('/dashboard');
+      navigate('/');
     } catch (error) {
       showToast.error(error.response?.data?.message || 'Registration failed. Please try again.');
     } finally {

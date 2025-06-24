@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { api } from '../api/index';
+import  api  from '../api';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
@@ -48,6 +48,24 @@ export const AuthProvider = ({ children }) => {
       return true;
     } catch (error) {
       toast.error(error.response?.data?.message || 'Login failed');
+      return false;
+    }
+  };
+  const register = async (userData) => {
+    try {
+      const response = await api.register(userData);
+      localStorage.setItem('token', response.token);
+      setUser({
+        id: response.user._id,
+        name: response.user.name,
+        email: response.user.email,
+        pregnancyWeek: response.user.pregnancyWeek
+      });
+      toast.success('Registered successfully!');
+      navigate('/');
+      return true;
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Registration failed');
       return false;
     }
   };

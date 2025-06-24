@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { api } from '../api/index';
+import  api  from '../api';
 
 export const AddMilestoneForm = ({ onClose, onAdd }) => {
   const [formData, setFormData] = useState({
