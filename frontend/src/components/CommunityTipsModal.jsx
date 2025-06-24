@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Star } from 'lucide-react';
-import { api } from '../../services/api';
+import { api } from '../api/index';
 
 export const CommunityTipsModal = ({ milestone, onClose }) => {
   const [tips, setTips] = useState([]);
