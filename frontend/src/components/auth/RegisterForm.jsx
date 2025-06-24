@@ -52,9 +52,27 @@ export const RegisterForm = () => {
 
   return (
     <div className="bg-white rounded-2xl shadow-xl p-10 max-w-xl w-full flex flex-col items-center">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">BabySteps</h1>
-        <p className="text-gray-600">Create your account</p>
+      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
+        <div className="text-center mb-8"></div>
+        {/* Heart Icon */}
+        <div className="flex items-center justify-center w-16 h-16 rounded-full bg-pink-100 mb-4">
+          <svg
+            width="36"
+            height="36"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#ec4899"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.3l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"></path>
+          </svg>
+        </div>
+        <h1 className="text-3xl font-bold text-gray-800 mb-2 text-center">
+          BabySteps
+        </h1>
+        <p className="text-gray-600 mb-8 text-center">Create your account</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -131,27 +149,7 @@ export const RegisterForm = () => {
             <p className="mt-1 text-sm text-red-600">{errors.pregnancyWeek}</p>
           )}
         </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Pregnancy Week
-          </label>
-          <input
-            type="number"
-            min="1"
-            max="42"
-            value={pregnancyWeek}
-            onChange={(e) => setPregnancyWeek(e.target.value)}
-            className={`w-full pr-4 py-3 border ${
-              errors.pregnancyWeek ? "border-red-500" : "border-gray-300"
-            } rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent`}
-            placeholder="Enter your current week"
-          />
-          {errors.pregnancyWeek && (
-            <p className="mt-1 text-sm text-red-600">{errors.pregnancyWeek}</p>
-          )}
-        </div>
-
+        
         <button
           type="submit"
           disabled={isLoading}

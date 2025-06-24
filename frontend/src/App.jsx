@@ -24,9 +24,10 @@ export const App = () => {
       <Toast />
       <Routes>
         {/* Protected routes */}
-        <Route element={<PrivateRoute />}>
+        {/* <Route element={<PrivateRoute />}>
           <Route path="/" element={<Dashboard />} />
-        </Route>
+        </Route> */}
+        <Route path="/" element={<Dashboard />} />
         {/* Public routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
